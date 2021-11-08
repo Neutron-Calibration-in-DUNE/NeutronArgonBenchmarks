@@ -19,7 +19,7 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
-#include "NeutronHPphysics.hh"
+#include "ArgonSphereNeutronHPphysics.hh"
 
 
 class ArgonSpherePhysicsList : public G4VModularPhysicsList
@@ -29,5 +29,5 @@ public:
     ~ArgonSpherePhysicsList();
 
     virtual void ConstructParticle();
-    //virtual void SetCuts();
+    virtual void SetCuts();
 };

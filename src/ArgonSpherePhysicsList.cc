@@ -34,7 +34,7 @@ void ArgonSpherePhysicsList::ConstructParticle()
     pShortLivedConstructor.ConstructParticle(); 
 }
 
-// void PhysicsList::SetCuts()
-// {
-//   SetCutValue(0*mm, "proton");
-// }
+void ArgonSpherePhysicsList::SetCuts()
+{
+  SetCutValue(0*mm, "proton");
+}

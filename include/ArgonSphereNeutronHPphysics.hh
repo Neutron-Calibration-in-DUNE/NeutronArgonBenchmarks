@@ -20,7 +20,7 @@
 #include "G4SystemOfUnits.hh"
 
 // local includes
-#include "NeutronHPMessenger.hh"
+#include "ArgonSphereNeutronHPMessenger.hh"
 
 #include "globals.hh"
 #include "G4VPhysicsConstructor.hh"
