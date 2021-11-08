@@ -44,19 +44,19 @@ void ArgonSphereDetectorConstruction::DefineMaterials()
     G4NistManager *nist = G4NistManager::Instance();
 
     fIAr36 = new G4Isotope(
-        "IAr36",        // name
+        "Ar36",        // name
         18.,            // atomic number
         36,             // atomic mass
         fAr36MassMol);  // molar mass
     
     fIAr38 = new G4Isotope(
-        "IAr38",        // name
+        "Ar38",        // name
         18.,            // atomic number
         38,             // atomic mass
         fAr38MassMol);  // molar mass
 
     fIAr40 = new G4Isotope(
-        "IAr40",        // name
+        "Ar40",        // name
         18.,            // atomic number
         40,             // atomic mass
         fAr40MassMol);  // molar mass
@@ -76,6 +76,8 @@ void ArgonSphereDetectorConstruction::DefineMaterials()
         fTemperature,   // temperature
         fPressure);     // pressure
     
+    fLAr->AddElement(fArIsotopes, 1);
+
     fWorldMat = nist->FindOrBuildMaterial("G4_AIR");
     fEnvMat   = nist->FindOrBuildMaterial("G4_AIR");
 }
@@ -127,6 +129,14 @@ G4VPhysicalVolume *ArgonSphereDetectorConstruction::Construct()
         true);
     
     fScoringVolume = logicSphere;
+
+    G4Material* material = physSphere->GetLogicalVolume()->GetMaterial();
+    std::cout << "LAr material properties:" << std::endl;
+    std::cout << "  [name]:     " << material->GetName() << std::endl;
+    std::cout << "  [density]:  " << material->GetDensity() << std::endl;
+    std::cout << "  [state]:    " << material->GetState() << std::endl;
+    std::cout << "  [temp]:     " << material->GetTemperature() << std::endl;
+    std::cout << "  [pressure]: " << material->GetPressure() << std::endl;
 
     return physWorld;
 }

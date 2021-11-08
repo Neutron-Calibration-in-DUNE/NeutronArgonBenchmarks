@@ -18,6 +18,8 @@
 #include "G4BaryonConstructor.hh"
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 
 #include "ArgonSphereNeutronHPphysics.hh"
 

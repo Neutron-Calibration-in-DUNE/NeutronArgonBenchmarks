@@ -2,7 +2,7 @@
  * @file    main.cc
  * @brief   The main function for the neutron simulation
  * @ingroup main
- * @author  Nicholas Carrara (nmcarrara@ucdavis.edu),
+ * @author  Gian Caceres [gcaceres@ucdavis.edu], Nicholas Carrara [nmcarrara@ucdavis.edu],
 **/
 #include <iostream>
 #include <vector>
@@ -59,6 +59,17 @@ int main(int argc, char** argv)
     {
         std::cout << "\t[" << i << "]: " << physicsLists[i] << std::endl;
     }
+    // print out all processes for neutrons
+    G4ParticleDefinition* neutron = G4Neutron::Neutron();
+    G4ProcessManager* pManager = neutron->GetProcessManager();
+    G4ProcessVector* processes = pManager->GetProcessList();
+    std::cout << "Enabled Neutron HP Physics Processes:" << std::endl;
+    for(size_t i = 0; i < processes->size(); i++)
+    {
+        std::cout << "\t[" << i << "]: " << (*processes)[i]->GetProcessName() << std::endl;
+    }
+    // print out physical volume properties
+    
 
     if (argc == 1)
     {

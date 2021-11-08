@@ -30,6 +30,14 @@ public:
 
     virtual G4VPhysicalVolume *Construct();
 
+    G4LogicalVolume* getLogicalWorldVolume()    { return logicWorld; }
+    G4LogicalVolume* getLogicalEnvVolume()      { return logicEnv; }
+    G4LogicalVolume* getLogicalSphereVolume()   { return logicSphere; }
+
+    G4VPhysicalVolume* getPhysicalWorldVolume()     { return physWorld; }
+    G4VPhysicalVolume* getPhysicalEnvVolume()       { return physEnv; }
+    G4VPhysicalVolume* getPhysicalSphereVolume()    { return physSphere; }
+
     G4LogicalVolume* GetScoringVolume() const { return fScoringVolume; }
 
 private:

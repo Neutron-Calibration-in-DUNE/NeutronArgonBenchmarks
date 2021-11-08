@@ -2,7 +2,7 @@
  * @file    ArgonSphereSteppingAction.hh
  * @brief   
  * @ingroup ArgonSphereSteppingAction
- * @author  Nicholas Carrara (nmcarrara@ucdavis.edu),
+ * @author  Gian Caceres [gcaceres@ucdavis.edu], Nicholas Carrara [nmcarrara@ucdavis.edu],
 **/
 #pragma once
 

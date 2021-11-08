@@ -1,3 +1,9 @@
+/**
+ * @file    ArgonSphereNeutronHPMessenger.hh
+ * @brief   
+ * @ingroup ArgonSphereNeutronHPMessenger
+ * @author  Nicholas Carrara (nmcarrara@ucdavis.edu),
+**/
 #pragma once
 
 #include "globals.hh"

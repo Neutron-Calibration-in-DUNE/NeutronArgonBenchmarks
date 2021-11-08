@@ -1,3 +1,9 @@
+/**
+ * @file    ArgonSphereNeutronHPphysics.hh
+ * @brief   
+ * @ingroup ArgonSphereNeutronHPphysics
+ * @author  Nicholas Carrara (nmcarrara@ucdavis.edu),
+**/
 #pragma once
 
 #include "G4ParticleDefinition.hh"
