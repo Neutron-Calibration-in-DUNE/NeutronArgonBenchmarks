@@ -7,9 +7,9 @@ ArgonSphereDetectorConstruction::ArgonSphereDetectorConstruction()
     xWorld  = 50001;
     yWorld  = 50001;
     zWorld  = 50001;
-    xEnv    = 50000;
-    yEnv    = 50000;
-    zEnv    = 50000;
+    xEnv    = xWorld;
+    yEnv    = yWorld;
+    zEnv    = zWorld;
     fRadius = 50000;
     // initialize argon parameters
     fTemperature = 85.8 * kelvin;
@@ -28,6 +28,9 @@ ArgonSphereDetectorConstruction::ArgonSphereDetectorConstruction()
 
     fMessenger = new G4GenericMessenger(this, "/detector/", "Detector Construction");
     //  parameters
+    fMessenger->DeclareProperty("x_world", xWorld, "half distance along world x direction");
+    fMessenger->DeclareProperty("y_world", yWorld, "half distance along world y direction");
+    fMessenger->DeclareProperty("z_world", zWorld, "half distance along world z direction");
     fMessenger->DeclareProperty("radius", fRadius, "radius of the sphere in cm");
 
     DefineMaterials();
