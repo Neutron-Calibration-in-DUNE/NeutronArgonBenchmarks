@@ -23,11 +23,14 @@
 #include "ArgonSphereDetectorConstruction.hh"
 #include "ArgonSpherePhysicsList.hh"
 #include "ArgonSphereActionInitialization.hh"
+#include "ArgonSphereAnalysis.hh"
 
 int main(int argc, char** argv)
 {
     // create a user session
     G4UIExecutive* ui = 0;
+    // create analysis singleton session
+    ArgonSphereAnalysis argonSphereAnalysis;
 
     // #ifdef G4MULTITHREADED
     //   G4MTRunManager* runManager = new G4MTRunManager;
@@ -39,6 +42,7 @@ int main(int argc, char** argv)
     runManager->SetUserInitialization(new ArgonSphereDetectorConstruction());
     runManager->SetUserInitialization(new ArgonSpherePhysicsList());
     runManager->SetUserInitialization(new ArgonSphereActionInitialization());
+    runManager->SetUserInitialization(new ArgonSphereAnalysisActionInitialization());
     
     // Replaced HP environmental variables with C++ calls                                                                                     
     G4ParticleHPManager::GetInstance()->SetSkipMissingIsotopes( true );
@@ -69,8 +73,6 @@ int main(int argc, char** argv)
         std::cout << "\t[" << i << "]: " << (*processes)[i]->GetProcessName() << std::endl;
     }
     // print out physical volume properties
-    
-
     if (argc == 1)
     {
         ui = new G4UIExecutive(argc, argv);
