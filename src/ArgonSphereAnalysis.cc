@@ -67,7 +67,7 @@ void ArgonSphereAnalysis::Step(const G4Step* step)
         // get the particle name
         G4String particleName = step->GetTrack()->GetDefinition()->GetParticleName();
         // if its a neutron, 
-        if (particleName == "neutron" )
+        if (particleName == "neutron")
         {
             // get logical and physical volumes of the current step
             G4LogicalVolume* logicVolume 
@@ -85,7 +85,7 @@ void ArgonSphereAnalysis::Step(const G4Step* step)
                 fTrackId.emplace_back(step->GetTrack()->GetTrackID());
                 fParentId.emplace_back(step->GetTrack()->GetParentID());
                 fPdgCode.emplace_back(2112);
-                fBeginProcess.emplace_back(step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName());
+                fBeginProcess.emplace_back("initStep");
                 fBeginVolume.emplace_back(physVolume->GetName());    
 
                 fBeginT.emplace_back(step->GetPreStepPoint()->GetLocalTime());
@@ -94,9 +94,9 @@ void ArgonSphereAnalysis::Step(const G4Step* step)
                 fBeginZ.emplace_back(step->GetPreStepPoint()->GetPosition().z());
                 fBeginE.emplace_back(step->GetPreStepPoint()->GetKineticEnergy());
             }
-            else
+            if (step->GetTrack()->GetTrackStatus() == fStopAndKill)
             {
-                // otherwise we will the ending information
+                // otherwise we will save the ending information
                 fEndT.emplace_back(step->GetPreStepPoint()->GetLocalTime());     
                 fEndProcess.emplace_back(step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName());
                 fEndVolume.emplace_back(physVolume->GetName());      

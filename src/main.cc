@@ -87,7 +87,7 @@ int main(int argc, char** argv)
         UImanager->ApplyCommand("/control/execute vis.mac");
         UImanager->ApplyCommand("/run/verbose 1");
         UImanager->ApplyCommand("/event/verbose 1");
-        UImanager->ApplyCommand("/tracking/verbose 1");
+        //UImanager->ApplyCommand("/tracking/verbose 1");
         ui->SessionStart();
     }
     else

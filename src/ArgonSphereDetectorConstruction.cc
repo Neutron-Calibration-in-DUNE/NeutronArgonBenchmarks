@@ -32,6 +32,11 @@ ArgonSphereDetectorConstruction::ArgonSphereDetectorConstruction()
     fMessenger->DeclareProperty("y_world", yWorld, "half distance along world y direction");
     fMessenger->DeclareProperty("z_world", zWorld, "half distance along world z direction");
     fMessenger->DeclareProperty("radius", fRadius, "radius of the sphere in cm");
+    fMessenger->DeclareProperty("temperature", fTemperature, "temperature of the LAr");
+    fMessenger->DeclareProperty("pressure", fPressure, "pressure of the LAr");
+    fMessenger->DeclareProperty("ar36_ratio", fAr36Ratio, "percentage of Ar36");
+    fMessenger->DeclareProperty("ar38_ratio", fAr38Ratio, "percentage of Ar38");
+    fMessenger->DeclareProperty("ar40_ratio", fAr40Ratio, "percentage of Ar40");
 
     DefineMaterials();
 }
@@ -84,6 +89,7 @@ void ArgonSphereDetectorConstruction::DefineMaterials()
 
 G4VPhysicalVolume *ArgonSphereDetectorConstruction::Construct()
 {
+    DefineMaterials();
     // create the world volume
     solidWorld  = new G4Box("solidWorld", xWorld, yWorld, zWorld);
     logicWorld  = new G4LogicalVolume(solidWorld, fWorldMat, "logicWorld");
