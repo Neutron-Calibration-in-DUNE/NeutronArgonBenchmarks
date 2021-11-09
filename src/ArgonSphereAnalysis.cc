@@ -17,6 +17,7 @@ ArgonSphereAnalysis::~ArgonSphereAnalysis()
 void ArgonSphereAnalysis::Initialize()
 {
     fNumberOfEvents = 0;
+    fNumberOfNeutrons = 0;
     fEvent.clear(); fTrackId.clear(); fParentId.clear(); fPdgCode.clear(); 
     fBeginProcess.clear(); fBeginVolume.clear(); fBeginT.clear(); 
     fBeginX.clear(); fBeginY.clear(); fBeginZ.clear(); fBeginE.clear();
@@ -78,8 +79,12 @@ void ArgonSphereAnalysis::Step(const G4Step* step)
             = step->GetPreStepPoint()->GetTouchableHandle()
             ->GetVolume();
             // collect t=0 information for all neutrons
-            if (step->IsFirstStepInVolume())
+            if (step->IsFirstStepInVolume() and physVolume->GetName() == "physSphere")
             {
+                fNeutronMap[std::make_pair(fNumberOfEvents, step->GetTrack()->GetTrackID())] = fNumberOfNeutrons;
+                fNeutronMapKeys.emplace_back(std::vector<int>({fNumberOfEvents,step->GetTrack()->GetTrackID()}));
+                fNumberOfNeutrons++;
+                fListOfNeutrons[fNumberOfEvents-1].emplace_back(step->GetTrack()->GetTrackID());
                 // fill in the beginning information
                 fEvent.emplace_back(fNumberOfEvents);
                 fTrackId.emplace_back(step->GetTrack()->GetTrackID());
@@ -93,10 +98,8 @@ void ArgonSphereAnalysis::Step(const G4Step* step)
                 fBeginY.emplace_back(step->GetPreStepPoint()->GetPosition().y());
                 fBeginZ.emplace_back(step->GetPreStepPoint()->GetPosition().z());
                 fBeginE.emplace_back(step->GetPreStepPoint()->GetKineticEnergy());
-            }
-            if (step->GetTrack()->GetTrackStatus() == fStopAndKill)
-            {
-                // otherwise we will save the ending information
+                // we must also emplace back
+                // in the ending variables and assign their values later
                 fEndT.emplace_back(step->GetPreStepPoint()->GetLocalTime());     
                 fEndProcess.emplace_back(step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName());
                 fEndVolume.emplace_back(physVolume->GetName());      
@@ -108,13 +111,50 @@ void ArgonSphereAnalysis::Step(const G4Step* step)
 
                 fTrackLength.emplace_back(step->GetTrack()->GetTrackLength());
             }
+            // check if neutron has been counted already
+
+            if (step->GetTrack()->GetTrackStatus() == fStopAndKill and physVolume->GetName() == "physSphere")
+            {
+                if (checkListOfNeutrons(fNumberOfEvents, step->GetTrack()->GetTrackID()))
+                {
+                    int neutronIndex = fNeutronMap[std::make_pair(fNumberOfEvents,step->GetTrack()->GetTrackID())];
+                    // otherwise we will save the ending information
+                    fEndT[neutronIndex] = step->GetPreStepPoint()->GetLocalTime();     
+                    fEndProcess[neutronIndex] = step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName();
+                    fEndVolume[neutronIndex] = physVolume->GetName();      
+
+                    fEndX[neutronIndex] = step->GetPreStepPoint()->GetPosition().x();
+                    fEndY[neutronIndex] = step->GetPreStepPoint()->GetPosition().y();
+                    fEndZ[neutronIndex] = step->GetPreStepPoint()->GetPosition().z();
+                    fEndE[neutronIndex] = step->GetPreStepPoint()->GetKineticEnergy();
+
+                    fTrackLength[neutronIndex] = step->GetTrack()->GetTrackLength();
+                }
+            }
         }
     }
+}
+
+// check list of neutrons
+bool ArgonSphereAnalysis::checkListOfNeutrons(size_t eventId, int trackId)
+{
+    if (eventId-1 >= fNumberOfEvents) { 
+        return false; 
+    }
+    else {
+        for (size_t i = 0; i < fListOfNeutrons[eventId-1].size(); i++) {
+            if (fListOfNeutrons[eventId-1][i] == trackId) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void ArgonSphereAnalysis::BeginEvent(const G4Event*)
 {   
     fNumberOfEvents++;
+    fListOfNeutrons.emplace_back(std::vector<int>());
 }
 
 void ArgonSphereAnalysis::EndEvent(const G4Event*)

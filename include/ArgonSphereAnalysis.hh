@@ -56,11 +56,17 @@ public:
     void EndEvent(const G4Event*);
     void Initialize();
     void Save();
+    bool checkListOfNeutrons(size_t eventId, int trackId);
  
     // output csv file
     std::string fOutputFilename;
     // number of events
     size_t fNumberOfEvents;
+    // map from (event_id,track_id) -> index
+    int fNumberOfNeutrons;
+    std::map<std::pair<size_t,int>, int> fNeutronMap;
+    std::vector<std::vector<int>> fNeutronMapKeys;
+    std::vector<std::vector<int>> fListOfNeutrons;
 
     // tuples for holding event information
     std::vector<size_t> fEvent;

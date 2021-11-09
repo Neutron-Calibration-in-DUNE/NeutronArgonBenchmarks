@@ -32,6 +32,7 @@ class Neutron:
     vol0:       str=''
     volf:       str=''
     proc_f:     str=''
+    num_inel:   int=0
 
 
 
@@ -48,6 +49,7 @@ class NeutronResults:
         self.number_of_primaries = 0
         self.number_of_inelastics = 0
         self.consolidated = consolidate_inelastics
+        self.map = {}
         # construct list of neutrons
         with open(input_file, "r") as file:
             reader = csv.reader(file, delimiter=",")
@@ -57,6 +59,7 @@ class NeutronResults:
                         self.number_of_primaries += 1
                     else:
                         self.number_of_inelastics += 1
+                    self.map[int(row[0]),int(row[1])] = len(self.neutrons)
                     self.neutrons.append(
                         Neutron(
                             event       = float(row[0]),
@@ -87,30 +90,29 @@ class NeutronResults:
             for i in range(len(self.neutrons)):
                 if self.neutrons[i].parent_id != 0:
                     # check for parent id
-                    parent_index = self.find_neutron(self.neutrons[i].parent_id)
-                    if parent_index != -1 and self.neutrons[parent_index].parent_id == 0:
+                    parent_index = self.find_neutron(self.neutrons[i].event, self.neutrons[i].parent_id)
+                    if (parent_index != -1 and self.neutrons[parent_index].parent_id == 0):
                         consistency_check += 1
+                        self.neutrons[parent_index].num_inel += 1
                         # add track information to primary
-                        self.neutrons[parent_index].tf += self.neutrons[i].tf - self.neutrons[i].t0
-                        self.neutrons[parent_index].xf = self.neutrons[i].xf
-                        self.neutrons[parent_index].yf = self.neutrons[i].yf
-                        self.neutrons[parent_index].zf = self.neutrons[i].zf
+                        self.neutrons[parent_index].tf += (self.neutrons[i].tf - self.neutrons[i].t0)
                         self.neutrons[parent_index].track_l += self.neutrons[i].track_l
-                        self.neutrons[parent_index].volf = self.neutrons[i].volf
-                        self.neutrons[parent_index].proc_f = self.neutrons[i].proc_f
+                        if (self.neutrons[parent_index].kf > self.neutrons[i].kf):
+                            self.neutrons[parent_index].xf = self.neutrons[i].xf
+                            self.neutrons[parent_index].yf = self.neutrons[i].yf
+                            self.neutrons[parent_index].zf = self.neutrons[i].zf
+                            self.neutrons[parent_index].kf = self.neutrons[i].kf
+                            self.neutrons[parent_index].volf = self.neutrons[i].volf
+                            self.neutrons[parent_index].proc_f = self.neutrons[i].proc_f
             print("Found {}/{} primaries for inelastics.".format(
                 consistency_check,self.number_of_inelastics
             ))
     #----------------------------------------------------------------------
     def find_neutron(self,
+        event_id:   int,
         track_id:   int,
     ):
-        """ Find the neutron with track_id = track_id """   
-        for i in range(len(self.neutrons)):
-            if self.neutrons[i].track_id == track_id:
-                return i
-        # return -1 if not found
-        return -1
+        return self.map[event_id,track_id]
      #----------------------------------------------------------------------
     def hist_lifetimes(self,
         num_bins:       int=100,
@@ -174,6 +176,7 @@ class NeutronResults:
             plt.savefig(save_plot)
         if show_plot:
             plt.show()
+        return lifetimes
     #----------------------------------------------------------------------
     def hist_tracklengths(self,
         num_bins:       int=100,
@@ -188,7 +191,7 @@ class NeutronResults:
         """
         Plot lifetime of the neutrons
         """
-        new_title = "Neutron Capture lifetime (ns) in LAr"
+        new_title = "Neutron Capture track length (cm) in LAr"
         if (
             energy_cut[0] != -1 or 
             energy_cut[1] != -1 or 
@@ -236,6 +239,7 @@ class NeutronResults:
             plt.savefig(save_plot)
         if show_plot:
             plt.show()
+        return tracklengths
     #----------------------------------------------------------------------
     def hist_final_energy(self,
         num_bins:       int=100,
@@ -250,7 +254,7 @@ class NeutronResults:
         """
         Plot lifetime of the neutrons
         """
-        new_title = "Neutron Capture lifetime (ns) in LAr"
+        new_title = "Neutron Capture final kE (MeV) in LAr"
         if (
             energy_cut[0] != -1 or 
             energy_cut[1] != -1 or 
@@ -300,10 +304,14 @@ class NeutronResults:
             plt.savefig(save_plot)
         if show_plot:
             plt.show()
+        return final_energy
      #----------------------------------------------------------------------
 
 if __name__ == "__main__":
-    neutron_results = NeutronResults("output.csv")
+    neutron_results = NeutronResults(
+        "output.csv",
+        consolidate_inelastics=True
+    )
 
     neutron_results.hist_lifetimes(
         save_plot="../plots/lifetimes.png"
@@ -311,7 +319,7 @@ if __name__ == "__main__":
     neutron_results.hist_tracklengths(
         save_plot="../plots/tracklength.png"
     )
-    neutron_results.hist_final_energy(
+    total_energy = neutron_results.hist_final_energy(
         save_plot="../plots/final_energy.png"
     )
 
@@ -323,4 +331,24 @@ if __name__ == "__main__":
     neutron_results.hist_final_energy(
         track_cut = [50000,-1],
         save_plot="../plots/final_energy>50m.png"
+    )
+
+    neutron_results.hist_lifetimes(
+        track_cut = [-1,50000],
+        save_plot="../plots/lifetimes<50m.png"
+    )
+
+    neutron_results.hist_lifetimes(
+        track_cut = [50000,-1],
+        save_plot="../plots/lifetimes>50m.png"
+    )
+
+    neutron_results.hist_final_energy(
+        track_cut = [175000,-1],
+        save_plot="../plots/final_energy>175m.png"
+    )
+
+    energy_cut = neutron_results.hist_final_energy(
+        track_cut = [-1, 175000],
+        save_plot="../plots/final_energy<175m.png"
     )
