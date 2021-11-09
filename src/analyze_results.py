@@ -80,9 +80,10 @@ class NeutronResults:
             bins=num_bins, 
             histtype='step', 
         )
-        axs.set_xlabel("lifetime [tf - t0]")
+        axs.set_xlabel("lifetime [tf - t0] (ns)")
         axs.set_title("Neutron lifetime in LAr - {}".format(self.input_file))
-        plt.show()
+        plt.savefig("lifetime.png")
+        #plt.show()
     
     def hist_final_energy(self,
         num_bins:       int=100,
@@ -95,18 +96,19 @@ class NeutronResults:
         for neutron in self.neutrons:
             if only_captures:
                 if neutron.proc_f == 'nCapture' and neutron.parent_id == 0:
-                    final_energy.append(np.log10(neutron.kf*10e5))
+                    final_energy.append(np.log10(neutron.kf))
         fig, axs = plt.subplots()
         axs.hist(
             final_energy, 
             bins=num_bins, 
             histtype='step', 
         )
-        extra_ticks = [np.log10(57)]
+        extra_ticks = [np.log10(.057)]
         axs.set_xticks(axs.get_xticks() + extra_ticks)
         axs.set_xlabel(r"$\log_{10}(KE)$ (keV)")
         axs.set_title("Neutron capture energy in LAr - {}".format(self.input_file))
-        plt.show()
+        plt.savefig("final_energy.png")
+        #plt.show()
 
 
 if __name__ == "__main__":

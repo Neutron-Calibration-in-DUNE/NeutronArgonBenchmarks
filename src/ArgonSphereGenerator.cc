@@ -24,7 +24,7 @@ ArgonSpherePrimaryGenerator::ArgonSpherePrimaryGenerator()
     
     fParticleGun->SetParticlePosition(fPosition);
     fParticleGun->SetParticleMomentumDirection(mom);
-    fParticleGun->SetParticleMomentum(2.5*MeV);
+    fParticleGun->SetParticleEnergy(2.5*MeV);
     fParticleGun->SetParticleDefinition(particle);
 }
 
