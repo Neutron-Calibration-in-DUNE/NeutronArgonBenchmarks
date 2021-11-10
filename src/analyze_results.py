@@ -3,14 +3,41 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 from typing import List
+from scipy.optimize import curve_fit
 
 plt.style.use("bmh")
 plt.rcParams.update({'font.size': 14})
 plt.rcParams.update({'figure.figsize': (10,8)})
 plt.rcParams.update({'lines.linewidth': 3})
 plt.rcParams.update({'legend.fontsize': 14})
-hist_options = {'histtype':'stepfilled', 'alpha':0.8, 'density':True, 'color':'tab:orange'}
+hist_options = {'histtype':'stepfilled', 'alpha':0.8, 'density':True, 'color':'mediumpurple'}
 
+# constants
+ANTIRESONANCE = .057
+LOG10_ANTIRESONANCE = np.log10(ANTIRESONANCE)
+LOG10_ANTIRESONANCE_STR = r"$\log_{10}(.057)$"
+# anti-resonance resonance peaks
+ANTIRESONANCE_PEAKS = [.01181, .017974]
+LOG10_ANTIRESONANCE_PEAKS = [np.log10(peak) for peak in ANTIRESONANCE_PEAKS]
+LOG10_ANTIRESONANCE_PEAKS_STR = [r"$\log_{10}(.011)$",r"$\log_{10}(.017)$"]
+
+
+ENDF_energy = []
+ENDF_xsec = []
+with open("../data/ENDF-6_Kawano.txt","r") as file:
+    reader = csv.reader(file, delimiter=",")
+    for row in reader:
+        ENDF_energy.append(float(row[0]))
+        ENDF_xsec.append(float(row[1]))
+
+def gauss(x, H, A, x0, sigma):
+    return H + A * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
+
+def gauss_fit(x, y):
+    mean = sum(x * y) / sum(y)
+    sigma = np.sqrt(sum(y * (x - mean) ** 2) / sum(y))
+    popt, pcov = curve_fit(gauss, x, y, p0=[min(y), max(y), mean, sigma])
+    return popt
 
 @dataclass
 class Neutron:
@@ -113,7 +140,7 @@ class NeutronResults:
         track_id:   int,
     ):
         return self.map[event_id,track_id]
-     #----------------------------------------------------------------------
+    #----------------------------------------------------------------------
     def hist_lifetimes(self,
         num_bins:       int=100,
         only_captures:  bool=True,
@@ -291,9 +318,17 @@ class NeutronResults:
             **hist_options, 
             label=self.input_file
         )
-        extra_ticks = [np.log10(.057)]
-        axs.set_xticks(axs.get_xticks() + extra_ticks)
-        axs.set_xlabel(r"$\log_{10}(KE)$ (MeV)")
+        energy_cut = [energy for energy in final_energy if (energy < LOG10_ANTIRESONANCE_PEAKS[0])]
+        gauss_mean = round(np.mean(energy_cut))
+        gauss_std  = np.std(energy_cut)
+       
+        ticks = list(axs.get_xticks())
+        new_ticks = [gauss_mean,np.amin(ticks),np.amax(ticks),LOG10_ANTIRESONANCE]+LOG10_ANTIRESONANCE_PEAKS
+        new_tick_labels = [str(gauss_mean),str(round(np.amin(ticks))),str(round(np.amax(ticks))),LOG10_ANTIRESONANCE_STR]+LOG10_ANTIRESONANCE_PEAKS_STR
+        axs.set_xticks(new_ticks)
+        axs.set_xticklabels(new_tick_labels,rotation='45',horizontalalignment='right')
+        axs.set_xlabel(r"$\log_{10}(KE) [\log_{10}(MeV)]$")
+        axs.set_xlim(-7.25,0.75)
         if title == '':
             axs.set_title(new_title)
         else:
