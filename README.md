@@ -1,5 +1,5 @@
 <p align="left">
-  <img height="60" src="https://i.ibb.co/nBQCMw8/ucdavisphysics.jpg" />
+  <img height="60" src="https://i.ibb.co/c6xb6k7/ucdavis.png" alt="ucdavis" border="0" />
 </p>
 
 # Argon40 and natural Argon Calibration Benchmarks
