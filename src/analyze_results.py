@@ -10,7 +10,7 @@ plt.rcParams.update({'font.size': 14})
 plt.rcParams.update({'figure.figsize': (10,8)})
 plt.rcParams.update({'lines.linewidth': 3})
 plt.rcParams.update({'legend.fontsize': 14})
-hist_options = {'histtype':'stepfilled', 'alpha':0.8, 'density':True, 'color':'mediumpurple'}
+hist_options = {'histtype':'step', 'alpha':0.8, 'density':True}
 
 # constants
 ANTIRESONANCE = .057
@@ -69,13 +69,28 @@ class NeutronResults:
     """
     def __init__(self,
         input_file: str='',
-        consolidate_inelastics: bool=True   # wether to combine inelastics with primaries
+        consolidate_inelastics: bool=True,   # wether to combine inelastics with primaries
+        mcnp_data:  str='',
     ):
         self.input_file = input_file
         self.neutrons = []
         self.number_of_primaries = 0
         self.number_of_inelastics = 0
         self.consolidated = consolidate_inelastics
+        self.mcnp = False
+        if mcnp_data != '':
+            self.mcnp = True
+            self.mcnp_lifetimes = []
+            self.mcnp_displacement = []
+            self.mcnp_distance = []
+            self.mcnp_final_ke = []
+            with open(mcnp_data, "r") as file:
+                reader = csv.reader(file,delimiter=",")
+                for row in reader:
+                    self.mcnp_final_ke.append(float(row[0]))
+                    self.mcnp_displacement.append(float(row[1]))
+                    self.mcnp_distance.append(float(row[2]))
+                    self.mcnp_lifetimes.append(float(row[3])) 
         self.map = {}
         # construct list of neutrons
         with open(input_file, "r") as file:
@@ -150,6 +165,7 @@ class NeutronResults:
         title:          str='',
         save_plot:      str='',
         show_plot:      bool=False,
+        mcnp:           bool=False,
     ):
         """
         Plot lifetime of the neutrons
@@ -192,6 +208,13 @@ class NeutronResults:
             **hist_options, 
             label=self.input_file
         )
+        if mcnp:
+            axs.hist(
+                self.mcnp_lifetimes, 
+                bins=num_bins, 
+                **hist_options, 
+                label='mcnp'
+            )
         axs.set_xlabel("lifetime [tf - t0] (ns)")
         if title == '':
             axs.set_title(new_title)
@@ -214,6 +237,7 @@ class NeutronResults:
         title:          str='',
         save_plot:      str='',
         show_plot:      bool=False,
+        mcnp:           bool=False,
     ):
         """
         Plot lifetime of the neutrons
@@ -255,6 +279,13 @@ class NeutronResults:
             **hist_options, 
             label=self.input_file
         )
+        if mcnp:
+            axs.hist(
+                self.mcnp_distance, 
+                bins=num_bins, 
+                **hist_options, 
+                label='mcnp'
+            )
         axs.set_xlabel("track length (cm)")
         if title == '':
             axs.set_title(new_title)
@@ -277,6 +308,7 @@ class NeutronResults:
         title:          str='',
         save_plot:      str='',
         show_plot:      bool=False,
+        mcnp:           bool=False,
     ):
         """
         Plot lifetime of the neutrons
@@ -318,6 +350,13 @@ class NeutronResults:
             **hist_options, 
             label=self.input_file
         )
+        if mcnp:
+            axs.hist(
+                np.log10(self.mcnp_final_ke), 
+                bins=num_bins, 
+                **hist_options, 
+                label='mcnp'
+            )
         energy_cut = [energy for energy in final_energy if (energy < LOG10_ANTIRESONANCE_PEAKS[0])]
         gauss_mean = round(np.mean(energy_cut))
         gauss_std  = np.std(energy_cut)
@@ -345,45 +384,49 @@ class NeutronResults:
 if __name__ == "__main__":
     neutron_results = NeutronResults(
         "output.csv",
-        consolidate_inelastics=True
+        consolidate_inelastics=True,
+        mcnp_data = 'mcnp_statistics.csv'
     )
 
     neutron_results.hist_lifetimes(
-        save_plot="../plots/lifetimes.png"
+        save_plot="../plots/lifetimes_compare.png",
+        mcnp=True
     )
     neutron_results.hist_tracklengths(
-        save_plot="../plots/tracklength.png"
+        save_plot="../plots/tracklength_compare.png",
+        mcnp=True
     )
     total_energy = neutron_results.hist_final_energy(
-        save_plot="../plots/final_energy.png"
+        save_plot="../plots/final_energy_compare.png",
+        mcnp=True
     )
 
-    neutron_results.hist_final_energy(
-        track_cut = [-1,50000],
-        save_plot="../plots/final_energy<50m.png"
-    )
+    # neutron_results.hist_final_energy(
+    #     track_cut = [-1,50000],
+    #     save_plot="../plots/final_energy<50m.png"
+    # )
 
-    neutron_results.hist_final_energy(
-        track_cut = [50000,-1],
-        save_plot="../plots/final_energy>50m.png"
-    )
+    # neutron_results.hist_final_energy(
+    #     track_cut = [50000,-1],
+    #     save_plot="../plots/final_energy>50m.png"
+    # )
 
-    neutron_results.hist_lifetimes(
-        track_cut = [-1,50000],
-        save_plot="../plots/lifetimes<50m.png"
-    )
+    # neutron_results.hist_lifetimes(
+    #     track_cut = [-1,50000],
+    #     save_plot="../plots/lifetimes<50m.png"
+    # )
 
-    neutron_results.hist_lifetimes(
-        track_cut = [50000,-1],
-        save_plot="../plots/lifetimes>50m.png"
-    )
+    # neutron_results.hist_lifetimes(
+    #     track_cut = [50000,-1],
+    #     save_plot="../plots/lifetimes>50m.png"
+    # )
 
-    neutron_results.hist_final_energy(
-        track_cut = [175000,-1],
-        save_plot="../plots/final_energy>175m.png"
-    )
+    # neutron_results.hist_final_energy(
+    #     track_cut = [175000,-1],
+    #     save_plot="../plots/final_energy>175m.png"
+    # )
 
-    energy_cut = neutron_results.hist_final_energy(
-        track_cut = [-1, 175000],
-        save_plot="../plots/final_energy<175m.png"
-    )
+    # energy_cut = neutron_results.hist_final_energy(
+    #     track_cut = [-1, 175000],
+    #     save_plot="../plots/final_energy<175m.png"
+    # )
