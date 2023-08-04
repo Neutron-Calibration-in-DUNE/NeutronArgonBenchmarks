@@ -6,11 +6,11 @@ ArgonSphereActionInitialization::ArgonSphereActionInitialization()
 ArgonSphereActionInitialization::~ArgonSphereActionInitialization()
 {}
 
-// void ArgonSphereActionInitialization::BuildForMaster() const
-// {
-//     // ArgonSphereRunAction *runAction = new ArgonSphereRunAction();
-//     // SetUserAction(runAction);
-// }
+void ArgonSphereActionInitialization::BuildForMaster() const
+{
+    ArgonSphereRunAction *runAction = new ArgonSphereRunAction();
+    SetUserAction(runAction);
+}
 
 void ArgonSphereActionInitialization::Build() const
 {

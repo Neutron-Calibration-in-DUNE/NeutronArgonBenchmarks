@@ -19,6 +19,6 @@ public:
     ArgonSphereActionInitialization();
     ~ArgonSphereActionInitialization();
     
-    //virtual void BuildForMaster() const;
+    virtual void BuildForMaster() const;
     virtual void Build() const;
 };

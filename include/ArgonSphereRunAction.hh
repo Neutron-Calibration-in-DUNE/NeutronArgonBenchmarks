@@ -10,7 +10,7 @@
 #include "G4UserRunAction.hh"
 #include "G4Run.hh"
 
-#include "g4root.hh"
+#include "G4AnalysisManager.hh"
 
 class ArgonSphereRunAction : public G4UserRunAction
 {

@@ -71,5 +71,8 @@ void ArgonSpherePrimaryGenerator::GeneratePrimaries(G4Event *anEvent)
     //fPosition.setX(fX); fPosition.setY(fY); fPosition.setZ(fZ);
     //std::cout << "here, " << fPosition.x() << std::endl;
     //fParticleGun->SetParticlePosition(fPosition);
+
+    G4double energy = (0.5 * MeV + (20.0 * MeV - 0.5 * MeV) * G4UniformRand());
+    fParticleGun->SetParticleEnergy(energy);
     fParticleGun->GeneratePrimaryVertex(anEvent);
 }
